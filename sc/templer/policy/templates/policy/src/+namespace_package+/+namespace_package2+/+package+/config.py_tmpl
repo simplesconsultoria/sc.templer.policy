@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+# File: config.py
+
+__author__ = """Simples Consultoria <products@simplesconsultoria.com.br>"""
+__docformat__ = 'plaintext'
+
+# PRODUCTS format 
+# (name,locked,hidden,install,profile,runProfile)
+
+PRODUCTS=[
+          ('plone.app.theming',0,1,1,'plone.app.theming:default',1),
+          ('plone.app.caching',0,1,1,'plone.app.caching:default',1),
+         ]

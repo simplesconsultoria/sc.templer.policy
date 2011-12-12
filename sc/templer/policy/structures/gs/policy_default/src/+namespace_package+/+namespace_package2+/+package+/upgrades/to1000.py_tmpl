@@ -1,0 +1,73 @@
+# -*- coding: utf-8 -*-
+import logging
+
+from zope import component
+
+from Products.CMFCore.utils import getToolByName
+from Products.GenericSetup import interfaces as gsinterfaces
+from Products.GenericSetup.upgrade import listUpgradeSteps
+
+from ${namespace_package}.${namespace_package2}.${package}.config import PRODUCTS
+
+
+PROJECT = '${namespace_package}.${namespace_package2}.${package}'
+
+
+def fromZero(context):
+    ''' Upgrade from Zero to version 1000
+    '''
+    setup = getToolByName(context, 'portal_setup')
+    jstool = getToolByName(context, 'portal_javascripts')
+    csstool = getToolByName(context,'portal_css')
+    ksstool = getToolByName(context,'portal_kss')
+    portal = getToolByName(context,'portal_url').getPortalObject()
+    migration = getToolByName(context,'portal_migration')
+    skins = getToolByName(context,'portal_skins')
+    vc = getToolByName(context,'portal_view_customizations')
+    catalog = getToolByName(context,'portal_catalog')
+    portal_properties = getToolByName(context,'portal_properties')
+    qi = getToolByName(context,'portal_quickinstaller')
+
+
+    # Desabilita modo de debug do js, css e kss
+    dmode = False
+    jstool.setDebugMode(dmode)
+    csstool.setDebugMode(dmode)
+    ksstool.setDebugMode(dmode)
+
+    # Remove default content
+
+    remove_default_content(portal)
+
+    # Install dependencies for this upgrade
+    # List package names
+    packages = [
+                 'plone.app.theming',
+                 #'plone.app.caching'
+               ]
+
+    # (name,locked,hidden,install,profile,runProfile)
+    dependencies = dict([(name,
+                         (name, locked, hidden, profile)) for name, locked, hidden, install, profile, runProfile in PRODUCTS if ((name in packages) and install)])
+
+    for name in packages:
+        name,locked,hidden,profile = dependencies[name]
+        # If in old namespace, we will install without Products.
+        if name.startswith('Products'):
+            name = name[9:]
+        qi.installProduct(name, locked=locked, hidden=hidden, profile=profile)
+
+
+def remove_default_content(portal):
+    ''' Clean up default content types
+        Reindex created objects
+    '''
+    logger = logging.getLogger(PROJECT)
+    content_ids = ['front-page','news','Members','events']
+    portal_ids = portal.objectIds()
+    for cId in content_ids:
+        if cId in portal_ids:
+            portal.manage_delObjects([cId,])
+            logger.info('Deleted object with id %s' % cId)
+
+    logger.info('Cleaned up portal contents')
