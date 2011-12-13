@@ -16,11 +16,5 @@
     <include file="profiles.zcml"/>
     #end if
 
-    <!-- Hide Products from QuickInstaller -->
-    <utility factory=".quickinstaller.HiddenProfiles"
-             name="${namespace_package}.${namespace_package2}.${package}" />
-    <utility factory=".quickinstaller.HiddenProducts"
-             name="${namespace_package}.${namespace_package2}.${package}" />
-    
-    
+
 </configure>
