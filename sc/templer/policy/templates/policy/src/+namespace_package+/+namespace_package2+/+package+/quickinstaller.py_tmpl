@@ -1,11 +1,13 @@
 # -*- coding:utf-8 -*-
 import Globals
+from five import grok
 
 from zope.interface import implements
 from Products.CMFQuickInstallerTool.interfaces import INonInstallable as INonInstallableProducts
 from Products.CMFPlone.interfaces import INonInstallable as INonInstallableProfiles
 
 from ${namespace_package}.${namespace_package2}.${package}.config import PRODUCTS
+
          
 def nonInstallableProducts(products):
     ''' Given a list of product tuples formated as
@@ -40,11 +42,26 @@ class HiddenProducts(object):
         return products
 
 
+grok.global_utility(HiddenProducts,
+                    provides=INonInstallableProducts,
+                    name="${namespace_package}.${namespace_package2}.${package}")
+
+
 class HiddenProfiles(object):
     implements(INonInstallableProfiles)
     
     def getNonInstallableProfiles(self):
+        #if str($add_profile_uninstall) == 'True'
+        profiles = ['${namespace_package}.${namespace_package2}.${package}:uninstall', ]
+        #end if
+        #if not(str($add_profile_uninstall) == 'True')
         profiles = []
+        #end if
         if not bool(Globals.DevelopmentMode):
             profiles = nonInstallableProfiles(PRODUCTS)
         return profiles
+
+
+grok.global_utility(HiddenProfiles,
+                    provides=INonInstallableProfiles,
+                    name="${namespace_package}.${namespace_package2}.${package}")
