@@ -15,6 +15,8 @@ class PortalPolicy(PlonePackage):
     summary = "A policy package following the Simples Consultoria standards"
     help = "A package that will manage a Plone installation"
 
+    category = "Simples Consultoria - Plone"
+
     _template_dir = "templates/policy"
     vars = copy.deepcopy(PlonePackage.vars)
 
