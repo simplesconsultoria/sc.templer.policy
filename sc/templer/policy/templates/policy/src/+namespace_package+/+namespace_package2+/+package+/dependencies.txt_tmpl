@@ -1,0 +1,23 @@
+[Plone]
+version= 4.1.4
+
+[five.grok]
+version= >=1.2
+
+[plone.app.caching]
+install= True
+hidden= False
+profile= plone.app.caching:default
+
+[plone.app.theming]
+install= True
+hidden= False
+profile= plone.app.theming:default
+
+# Example package registration
+#[package.name]
+#version= 1.1
+#install= True
+#hidden= False
+#profile= package.name:default
+
