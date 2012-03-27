@@ -1,13 +1,28 @@
 # -*- coding: utf-8 -*-
-# File: config.py
+from ConfigParser import ConfigParser
 
-__author__ = """Simples Consultoria <products@simplesconsultoria.com.br>"""
-__docformat__ = 'plaintext'
+requirements_file = open("requirements.txt")
 
-# PRODUCTS format 
-# (name,locked,hidden,install,profile,runProfile)
 
-PRODUCTS=[
-          ('plone.app.theming',0,1,1,'plone.app.theming:default',1),
-          ('plone.app.caching',0,1,1,'plone.app.caching:default',1),
-         ]
+def dependencies():
+    dependencies = []
+    config = ConfigParser()
+    config.readfp(requirements_file)
+    for section in config.sections():
+        hidden = config.getboolean(section, 'hidden', True, {'hidden': False})
+        install = config.getboolean(section, 'install', True,
+                                   {'install': False})
+        profile = config.get(section, 'profile', True, {'profile': ''})
+        runProfile = profile and True or False
+        locked = False
+        if install:
+            dependencies.append((section,
+                                 locked,
+                                 hidden,
+                                 install,
+                                 profile,
+                                 runProfile))
+    return dependencies
+
+
+PRODUCTS = dependencies()
