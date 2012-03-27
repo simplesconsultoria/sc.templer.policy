@@ -1,8 +1,28 @@
 # -*- coding:utf-8 -*-
 import os
+
+from ConfigParser import ConfigParser
+
 from setuptools import setup, find_packages
 
 version = '$version'
+
+requirements_file = open(os.path.join("src",
+                                      "$namespace_package",
+                                      "$namespace_package2",
+                                      "$package",
+                                      "dependencies.txt"))
+
+def requirements():
+    requirements = []
+    config = ConfigParser()
+    config.readfp(requirements_file)
+    for section in config.sections():
+        version = config.get(section, 'version', True, {'version': ''})
+        if version and version[0].isdigit():
+            version = '==' + version
+        requirements.append('%s%s' % (section, version))
+    return requirements
 
 setup(name='$namespace_package.$namespace_package2.$package',
       version=version,
@@ -25,19 +45,14 @@ setup(name='$namespace_package.$namespace_package2.$package',
       url=${repr($url) or $empty},
       license=${repr($license_name) or $empty},
       packages=find_packages('src'),
-      package_dir = {'': 'src'},
+      package_dir={'': 'src'},
       namespace_packages=['$namespace_package', 
                          '$namespace_package.$namespace_package2'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
           'setuptools',
-          # -*- Extra requirements: -*-
-          'Plone',
-          'five.grok',
-          'plone.app.theming',
-          'plone.app.caching',
-      ],
+      ] + requirements() ,
       extras_require={
         'test': ['plone.app.testing'],
         },
