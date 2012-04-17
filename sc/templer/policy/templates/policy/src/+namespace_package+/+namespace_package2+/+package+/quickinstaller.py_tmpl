@@ -2,46 +2,26 @@
 import Globals
 from five import grok
 
-from zope.interface import implements
-from Products.CMFQuickInstallerTool.interfaces import INonInstallable as INonInstallableProducts
-from Products.CMFPlone.interfaces import INonInstallable as INonInstallableProfiles
+from Products.CMFQuickInstallerTool.interfaces import (
+                    INonInstallable as INonInstallableProducts)
+from Products.CMFPlone.interfaces import (
+                    INonInstallable as INonInstallableProfiles)
 
-from ${namespace_package}.${namespace_package2}.${package}.config import PRODUCTS
+from ${namespace_package}.${namespace_package2}.${package}.config import DEPENDENCIES
+from ${namespace_package}.${namespace_package2}.${package}.config import PROJECTNAME
 
          
-def nonInstallableProducts(products):
-    ''' Given a list of product tuples formated as
-        (name,locked,hidden,install,profile,runProfile)
-        we return a list of names to be used by HiddenProducts
-    '''
-    pNames = [name for (name,locked,hidden,install,profile,runProfile) in products 
-                   if hidden]
-    pOldStyle = [name.replace('Products.','') for name in pNames 
-                                              if name.startswith('Products.')]
-    pNames = pOldStyle + pNames
-    return pNames
-
-
-def nonInstallableProfiles(products):
-    ''' Given a list of product tuples formated as
-        (name,locked,hidden,install,profile,runProfile)
-        we return a list of names to be used by HiddenProfiles
-    '''
-    pNames = [profile for (name,locked,hidden,install,profile,runProfile) in products 
-                   if hidden]
-    return pNames
-
-
 class HiddenProducts(grok.GlobalUtility):
 
     grok.implements(INonInstallableProducts)
     grok.provides(INonInstallableProducts)
-    grok.name('${namespace_package}.${namespace_package2}.${package}')
+    grok.name(PROJECTNAME)
 
     def getNonInstallableProducts(self):
         products = []
         if not bool(Globals.DevelopmentMode):
-            products = nonInstallableProducts(PRODUCTS)
+            products = [deps.get_package_name(p['package'])
+                for p in DEPENDENCIES if p['hidden']]
         return products
 
 
@@ -49,15 +29,12 @@ class HiddenProfiles(grok.GlobalUtility):
 
     grok.implements(INonInstallableProfiles)
     grok.provides(INonInstallableProfiles)
-    grok.name('${namespace_package}.${namespace_package2}.${package}')
+    grok.name(PROJECTNAME)
 
     def getNonInstallableProfiles(self):
-        #if str($add_profile_uninstall) == 'True'
-        profiles = ['${namespace_package}.${namespace_package2}.${package}:uninstall', ]
-        #end if
-        #if not(str($add_profile_uninstall) == 'True')
-        profiles = []
-        #end if
+        name = '%s:uninstall' % PROJECTNAME
+        profiles = [name]
         if not bool(Globals.DevelopmentMode):
-            profiles = nonInstallableProfiles(PRODUCTS)
+            profiles.extend([p['profile']
+                for p in DEPENDENCIES if p['hidden']])
         return profiles

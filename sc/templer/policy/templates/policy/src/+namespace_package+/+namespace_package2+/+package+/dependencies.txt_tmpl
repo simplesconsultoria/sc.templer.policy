@@ -1,8 +1,10 @@
 [Plone]
-version= 4.1.4
+version= $plone_version
 
-[five.grok]
-version= >=1.2
+[sc.policy.helper]
+
+#[collective.grok]
+#Included by sc.policy.helper
 
 [plone.app.caching]
 install= True

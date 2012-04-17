@@ -1,28 +1,55 @@
 # -*- coding: utf-8 -*-
-from ConfigParser import ConfigParser
+import logging
 
-requirements_file = open("requirements.txt")
+import ${namespace_package}.${namespace_package2}.${package}
 
+from collective.grok import gs
 
-def dependencies():
-    dependencies = []
-    config = ConfigParser()
-    config.readfp(requirements_file)
-    for section in config.sections():
-        hidden = config.getboolean(section, 'hidden', True, {'hidden': False})
-        install = config.getboolean(section, 'install', True,
-                                   {'install': False})
-        profile = config.get(section, 'profile', True, {'profile': ''})
-        runProfile = profile and True or False
-        locked = False
-        if install:
-            dependencies.append((section,
-                                 locked,
-                                 hidden,
-                                 install,
-                                 profile,
-                                 runProfile))
-    return dependencies
+from sc.policy.helper import deps
+from sc.policy.helper import setup
+
+from ${namespace_package}.${namespace_package2}.${package} import MessageFactory as _
 
 
-PRODUCTS = dependencies()
+PROJECTNAME = '${namespace_package}.${namespace_package2}.${package}'
+PROFILE_ID = '${namespace_package}.${namespace_package2}.${package}:default'
+
+DEPENDENCIES = deps.get_package_dependencies(${namespace_package}.${namespace_package2}.${package})
+
+
+#if str($add_profile) == 'True'
+# Default Profile
+gs.profile(name=u'default',
+           title=_(u'Install ${namespace_package}.${namespace_package2}.${package}'),
+           description=_(u'${namespace_package}.${namespace_package2}.${package}'),
+           directory='profiles/default')
+#end if
+
+#if str($add_profile_uninstall) == 'True'
+# Uninstall Profile
+gs.profile(name=u'uninstall',
+           title=_(u'Uninstall ${namespace_package}.${namespace_package2}.${package}'),
+           description=_(u'${namespace_package}.${namespace_package2}.${package}'),
+           directory='profiles/uninstall')
+#end if
+
+#if str($add_profile_init_content) == 'True'
+# Initial content Profile
+gs.profile(name=u'init_content',
+           title=_(u'${namespace_package}.${namespace_package2}.${package}: Initial content structure'),
+           description=_(u'${namespace_package}.${namespace_package2}.${package}'),
+           directory='profiles/init_content')
+#end if
+
+
+@gs.importstep(name=u'${namespace_package}.${namespace_package2}.${package}',
+               title='Run upgrades',
+               description='Import step used to upgrade the portal.',
+               dependencies=['plone_content'])
+def run_upgrades(context):
+    ''' Run Upgrade steps
+    '''
+    if context.readDataFile('${namespace_package}.${namespace_package2}.${package}-default.txt') is None:
+        return
+    logger = logging.getLogger(PROJECTNAME)
+    setup.run_upgrades_for_profile(PROFILE_ID, context, logger)

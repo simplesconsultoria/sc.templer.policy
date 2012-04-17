@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest2 as unittest
 
+import ${namespace_package}.${namespace_package2}.${package}
+
 from zope.site.hooks import setSite
 
 from plone.app.testing import TEST_USER_ID
@@ -8,11 +10,10 @@ from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import login
 from plone.app.testing import setRoles
 
-from ${namespace_package}.${namespace_package2}.${package}.config import PRODUCTS
-from ${namespace_package}.${namespace_package2}.${package}.testing import INTEGRATION_TESTING
+from sc.policy.helper import deps
 
-PROJECTNAME = '${namespace_package}.${namespace_package2}.${package}'
-PRODUCT_DEPENDENCIES = [item[0] for item in PRODUCTS]
+from ${namespace_package}.${namespace_package2}.${package}.config import PROJECTNAME
+from ${namespace_package}.${namespace_package2}.${package}.testing import INTEGRATION_TESTING
 
 
 class BaseTestCase(unittest.TestCase):
@@ -21,13 +22,14 @@ class BaseTestCase(unittest.TestCase):
     layer = INTEGRATION_TESTING
 
     def setUpUser(self):
-        setRoles(self.portal, TEST_USER_ID, ['Manager', 'Editor', 'Reviewer',])
+        setRoles(self.portal, TEST_USER_ID, ['Manager', 'Editor', 'Reviewer'])
         login(self.portal, TEST_USER_NAME)
 
     def setUp(self):
         portal = self.layer['portal']
         setSite(portal)
         self.portal = portal
+        self.deps = deps.get_package_dependencies(${namespace_package}.${namespace_package2}.${package})
         self.qi = getattr(self.portal, 'portal_quickinstaller')
         self.pp = getattr(self.portal, 'portal_properties')
         self.wt = getattr(self.portal, 'portal_workflow')
@@ -43,7 +45,9 @@ class TestInstall(BaseTestCase):
                         '%s not installed' % PROJECTNAME)
 
     def test_base_dependencies_installed(self):
-        for p in PRODUCT_DEPENDENCIES:
+        dependencies = [deps.get_package_name(p['package'])
+                        for p in self.deps]
+        for p in dependencies:
             if p.startswith('Products'):
                 p = p[9:]
             self.assertTrue(self.qi.isProductInstalled(p),
