@@ -13,6 +13,7 @@ requirements_file = open(os.path.join("src",
                                       "$package",
                                       "dependencies.txt"))
 
+
 def requirements():
     requirements = []
     config = ConfigParser()
@@ -46,13 +47,13 @@ setup(name='$namespace_package.$namespace_package2.$package',
       license=${repr($license_name) or $empty},
       packages=find_packages('src'),
       package_dir={'': 'src'},
-      namespace_packages=['$namespace_package', 
+      namespace_packages=['$namespace_package',
                          '$namespace_package.$namespace_package2'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
           'setuptools',
-      ] + requirements() ,
+      ] + requirements(),
       extras_require={
         'test': ['plone.app.testing'],
         },
