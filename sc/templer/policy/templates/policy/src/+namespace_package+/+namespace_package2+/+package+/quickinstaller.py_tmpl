@@ -2,6 +2,8 @@
 import Globals
 from five import grok
 
+from sc.policy.helper import deps
+
 from Products.CMFQuickInstallerTool.interfaces import (
                     INonInstallable as INonInstallableProducts)
 from Products.CMFPlone.interfaces import (
