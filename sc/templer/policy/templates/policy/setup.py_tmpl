@@ -16,10 +16,11 @@ requirements_file = open(os.path.join("src",
 
 def requirements():
     requirements = []
-    config = ConfigParser()
+    defaults = dict(version='')
+    config = ConfigParser(defaults)
     config.readfp(requirements_file)
     for section in config.sections():
-        version = config.get(section, 'version', True, {'version': ''})
+        version = config.get(section, 'version')
         if version and version[0].isdigit():
             version = '==' + version
         requirements.append('%s%s' % (section, version))
