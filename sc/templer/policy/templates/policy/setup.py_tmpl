@@ -18,7 +18,7 @@ def get_install_requirements():
                         "$namespace_package",
                         "$namespace_package2",
                         "$package",
-                        "dependencies.txt"))
+                        "dependencies.txt")
     requirements = []
     defaults = dict(version='')
     config = ConfigParser.ConfigParser(defaults)
