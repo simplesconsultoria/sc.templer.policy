@@ -1,24 +1,28 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
+
 import os
-
-from ConfigParser import ConfigParser
-
 from setuptools import setup, find_packages
 
 version = '$version'
-
-requirements_file = open(os.path.join("src",
-                                      "$namespace_package",
-                                      "$namespace_package2",
-                                      "$package",
-                                      "dependencies.txt"))
+long_description = open("README.txt").read() + "\n" + \
+                   open(os.path.join("docs", "INSTALL.txt")).read() + "\n" + \
+                   open(os.path.join("docs", "HISTORY.txt")).read()
 
 
-def requirements():
+# TODO: move this to another place
+def get_install_requirements():
+    """ XXX: document me!
+    """
+    import ConfigParser
+    path = os.path.join("src",
+                        "$namespace_package",
+                        "$namespace_package2",
+                        "$package",
+                        "dependencies.txt"))
     requirements = []
     defaults = dict(version='')
-    config = ConfigParser(defaults)
-    config.readfp(requirements_file)
+    config = ConfigParser.ConfigParser(defaults)
+    config.read([path])
     for section in config.sections():
         version = config.get(section, 'version')
         if version and version[0].isdigit():
@@ -26,20 +30,23 @@ def requirements():
         requirements.append('%s%s' % (section, version))
     return requirements
 
+
 setup(name='$namespace_package.$namespace_package2.$package',
       version=version,
       description="${description or None}",
-      long_description=open("README.rst").read() + "\n" +
-                       open(os.path.join("docs", "HISTORY.txt")).read(),
+      long_description=long_description,
       classifiers=[
+        "Environment :: Web Environment",
         "Framework :: Plone",
         "Framework :: Plone :: $plone_version",
         "Framework :: Zope2",
         "Framework :: Zope3",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Office/Business",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-        "Topic :: Software Development :: Libraries :: Python Modules",
         ],
       keywords=${repr($keywords) or $empty},
       author=${repr($author) or $empty},
@@ -52,15 +59,11 @@ setup(name='$namespace_package.$namespace_package2.$package',
                          '$namespace_package.$namespace_package2'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=[
-          'setuptools',
-      ] + requirements(),
+      install_requires=['setuptools'] + get_install_requirements(),
       extras_require={
         'test': ['plone.app.testing'],
         },
       entry_points="""
-      # -*- Entry points: -*-
-
       [z3c.autoinclude.plugin]
       target = plone
       """,
